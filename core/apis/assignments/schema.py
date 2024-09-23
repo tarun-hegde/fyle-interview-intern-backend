@@ -1,6 +1,7 @@
 from marshmallow import Schema, EXCLUDE, fields, post_load, ValidationError
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_enum import EnumField
+from core.libs import assertions
 from core.models.assignments import Assignment, GradeEnum
 from core.libs.helpers import GeneralObject
 
@@ -23,9 +24,7 @@ class AssignmentSchema(SQLAlchemyAutoSchema):
     def initiate_class(self, data_dict, many, partial):
         # pylint: disable=unused-argument,no-self-use
 
-        if len(data_dict.keys()) == 0:
-            raise ValidationError("At least one field is required")
-
+        assertions.assert_true(len(data_dict.keys()) > 0, 'No data was provided')
         return Assignment(**data_dict)
 
 
