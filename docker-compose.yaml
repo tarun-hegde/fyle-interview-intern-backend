@@ -1,7 +1,12 @@
 services:
-  fyle-backend:
-    image: fyle-backend:latest
+  web_app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "7755:7755"
+    environment:
+      FLASK_APP: core/server.py
     volumes:
-      - ./core/store.sqlite3:/home/app/fyle-backend/store.sqlite3:rw
+      - .:/app
+    command: bash run.sh

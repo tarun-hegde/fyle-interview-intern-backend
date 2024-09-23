@@ -1,22 +1,26 @@
-FROM python:3.8-slim-bookworm
+FROM python:3.8-slim
 
-RUN mkdir -p /home/app
+# Set the working directory in the container and copy the contents
+WORKDIR /app
+COPY . /app
 
-RUN useradd app
+# Configuring virtual environment
+RUN pip install virtualenv
+RUN virtualenv env --python=python3.8
 
-ENV HOME=/home/app
-ENV APP_HOME=/home/app/fyle-backend
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
+# Activate the virtual environment and install dependencies
+RUN . env/bin/activate  
+RUN  pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --upgrade pip
+# Set environment variables
+ENV FLASK_APP=core/server.py
 
-COPY . $APP_HOME
+# Remove any existing SQLite database and run db migrations
+RUN rm -f core/store.sqlite3
+RUN flask db upgrade -d core/migrations/
 
-RUN pip install --no-cache -r requirements.txt
+# Expose the port 
+EXPOSE 7755
 
-RUN chown -R app:app $APP_HOME
-
-USER app
-
-ENTRYPOINT ["/home/app/fyle-backend/run.sh"]
+# Command to start the server using a bash script
+CMD ["bash", "run.sh"]

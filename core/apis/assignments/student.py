@@ -2,9 +2,8 @@ from flask import Blueprint
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
-from core.libs import assertions
 from core.models.assignments import Assignment
-
+from core.libs.exceptions import FyleError
 from .schema import AssignmentSchema, AssignmentSubmitSchema
 student_assignments_resources = Blueprint('student_assignments_resources', __name__)
 
@@ -23,10 +22,10 @@ def list_assignments(p):
 @decorators.authenticate_principal
 def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
+    if incoming_payload.get('content') == None:
+        raise FyleError(400, "Content cannot be null")
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
-
-    assertions.assert_valid(assignment.content is not None, 'content cannot be null')
 
     upserted_assignment = Assignment.upsert(assignment)
     db.session.commit()

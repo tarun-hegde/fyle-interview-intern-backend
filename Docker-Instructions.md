@@ -5,23 +5,19 @@
 - Build the docker image using following command
 
     ```bash
-    docker build -t fyle-backend:latest .
+    docker build -t flask-app .
     ```
 
-## Create sqlite database
+## Run the Docker container:
 
-- If an exsiting DB.sqlite exists, specify it in `docker-compose.yaml` as follows
+- This will start the Flask application, and it will be accessible at http://localhost:7755.
 
-    ```bash
-    volumes:
-        - /path/to/file.sqlite3:/home/app/fyle-backend/store.sqlite3:rw
+    ```bash 
+    docker run -p 7755:7755 flask-app
     ```
+    
 
-- OR create an empty DB.sqlite using the following command
 
-    ```bash
-    touch store.sqlite3
-    ```
 
 ## Run container
 

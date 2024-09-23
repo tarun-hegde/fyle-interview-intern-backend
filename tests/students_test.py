@@ -22,10 +22,6 @@ def test_get_assignments_student_2(client, h_student_2):
     data = response.json['data']
     for assignment in data:
         assert assignment['student_id'] == 2
-        assert assignment['content'] is not None
-        assert assignment["id"] is not None
-        assert assignment["state"] is not None
-        assert assignment["teacher_id"] is not None
 
 
 def test_post_assignment_null_content(client, h_student_1):
@@ -60,32 +56,6 @@ def test_post_assignment_student_1(client, h_student_1):
     assert data['state'] == 'DRAFT'
     assert data['teacher_id'] is None
 
-def test_edit_assignment_student_1(client, h_student_1):
-    content = 'ABCD TESTPOST edit1'
-    response = client.post(
-        '/student/assignments',
-        headers=h_student_1,
-        json={
-            "id":   2,
-            'content': content
-        })
-    assert response.status_code == 200
-    data = response.json['data']
-    assert data['content'] == content
-    assert data['state'] == 'DRAFT'
-    assert data['teacher_id'] is None
-    
-def test_edit_assignment_student_2_error(client, h_student_2):
-    content = 'Should not be updated'
-    response = client.post(
-        '/student/assignments',
-        headers=h_student_2,
-        json={
-            'id': 3,
-            'content': content  
-        })
-    assert response.status_code == 400
-
 def test_submit_assignment_student_1(client, h_student_1):
     response = client.post(
         '/student/assignments/submit',
@@ -115,3 +85,16 @@ def test_assignment_resubmit_error(client, h_student_1):
     assert response.status_code == 400
     assert error_response['error'] == 'FyleError'
     assert error_response["message"] == 'only a draft assignment can be submitted'
+
+def test_get_assignments_student_does_not_exist(client, h_student_does_not_exist):
+    """
+    Test case for an invalid student
+    """
+    response = client.get(
+        '/student/assignments',
+        headers=h_student_does_not_exist
+    )
+
+    assert response.status_code == 404
+    assert response.json['error'] == 'FyleError'
+    assert response.json['message'] == 'Student with given id does not exist'

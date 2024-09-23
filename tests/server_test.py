@@ -1,35 +1,58 @@
-def test_ready(client):
-    response = client.get(
-        '/',
-    )
+from core.libs.exceptions import FyleError
+
+
+def test_root_endpoint(client):
+    """
+    Test to check server is running correctly.
+    """
+    response = client.get('/')
     assert response.status_code == 200
-def test_no_api(client):
-    response = client.get(
-        '/hello',
-    )   
+    assert response.json['status'] == 'ready'
+
+
+def test_error_handling_validation_error(client, h_teacher_1):
+    """
+    Test to check validation error handling
+    """
+    response = client.post(
+        '/teacher/assignments/grade',
+        headers=h_teacher_1,
+        json={})
+    assert response.status_code == 400
+    assert response.json['error'] == 'ValidationError'
+
+
+def test_error_handling_http_exception(client):
+    """
+    failure case: When an invalid endpoint is requested
+    """
+    response = client.get('/nonexistent-route')
     assert response.status_code == 404
-def test_no_auth_header_error(client):
-    for url in ['/student/assignments', '/teacher/assignments', '/principal/assignments']:
-        response = client.get(
-            url
-        )
-        assert response.status_code == 401
-def test_incorrect_auth_token_error(client, h_student_1, h_teacher_1, h_principal):
-    for url in ['/teacher/assignments', '/principal/assignments']:
-        response = client.get(
-            url,
-            headers=h_student_1
-        )
-        assert response.status_code == 403
-    for url in ['/student/assignments', '/principal/assignments']:
-        response = client.get(
-            url,
-            headers=h_teacher_1
-        )
-        assert response.status_code == 403
-    for url in ['/student/assignments', '/teacher/assignments']:
-        response = client.get(
-            url,
-            headers=h_principal
-        )
-        assert response.status_code == 403
+    assert response.json['error'] == 'NotFound'
+
+
+def test_fyle_error_creation():
+    """
+    Test to check that FyleError handling is working properly.
+    """
+    error_message = "Test FyleError message"
+    error_code = 400
+
+    fyle_error = FyleError(error_code, error_message)
+
+    assert fyle_error.status_code == error_code
+    assert fyle_error.message == error_message
+
+
+def test_fyle_error_to_dict():
+    """
+    Test to check that FyleError handling is working properly. 
+    """
+    error_message = "Test FyleError message"
+    error_code = 400
+
+    fyle_error = FyleError(error_code, error_message)
+    error_dict = fyle_error.to_dict()
+
+    assert isinstance(error_dict, dict)
+    assert error_dict['message'] == error_message

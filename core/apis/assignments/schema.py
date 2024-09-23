@@ -1,7 +1,6 @@
-from marshmallow import Schema, EXCLUDE, ValidationError, fields, post_load
+from marshmallow import Schema, EXCLUDE, fields, post_load
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
 from marshmallow_enum import EnumField
-from core.libs import assertions
 from core.models.assignments import Assignment, GradeEnum
 from core.libs.helpers import GeneralObject
 
@@ -23,7 +22,6 @@ class AssignmentSchema(SQLAlchemyAutoSchema):
     @post_load
     def initiate_class(self, data_dict, many, partial):
         # pylint: disable=unused-argument,no-self-use
-        assertions.assert_true(len(data_dict.keys()) > 0, 'No data was provided')
         return Assignment(**data_dict)
 
 
