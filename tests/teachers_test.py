@@ -39,7 +39,7 @@ def test_grade_assignment(client, h_teacher_1):
     assert data['state'] == 'GRADED'
     assert data['id'] == 1
     assert data['teacher_id'] == 1
-    
+
 def test_grade_assignment_cross(client, h_teacher_2):
     """
     failure case: assignment 1 was submitted to teacher 1 and not teacher 2

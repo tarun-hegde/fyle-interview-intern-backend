@@ -1,8 +1,8 @@
 from flask import Blueprint
 from core import db
 from core.apis import decorators
-from core.libs import assertions
 from core.apis.responses import APIResponse
+from core.libs import assertions
 from core.models.assignments import Assignment
 
 from .schema import AssignmentSchema, AssignmentSubmitSchema
@@ -25,6 +25,7 @@ def upsert_assignment(p, incoming_payload):
     """Create or Edit an assignment"""
     assignment = AssignmentSchema().load(incoming_payload)
     assignment.student_id = p.student_id
+
     assertions.assert_valid(assignment.content is not None, 'content cannot be null')
 
     upserted_assignment = Assignment.upsert(assignment)
