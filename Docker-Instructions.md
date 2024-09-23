@@ -19,10 +19,17 @@
 
 
 
-## Run container
+## Run the Docker Compose command
 
-- Use the docker compose command to run the container as follows
+- This will build the Docker image and start the Flask application, accessible at http://localhost:7755
 
     ```bash
     docker compose up -d
     ```
+
+- This will stop and remove the containers, networks, and volumes created by docker-compose up
+
+    ```bash
+    docker compose down
+    ```
+    
